@@ -229,6 +229,7 @@ async def crank(inter: disnake.ApplicationCommandInteraction, limit: int = 0) ->
     limit: An integer value that represent how many users you want to print.
     """
     await inter.response.defer()
+    logger.info(f"Calling crank")
     userList, rankList = get_rank_order(val_users, "crank", limit)
     embed = disnake.Embed(title="Current Ranks", color=disnake.Color.blue())
     embed.add_field(name="Val User", value="\n".join(userList), inline=True)
@@ -246,6 +247,7 @@ async def hrank(inter: disnake.ApplicationCommandInteraction, limit: int = 0) ->
     limit: An integer value that represent how many users you want to print.
     """
     await inter.response.defer()
+    logger.info(f"Calling hrank")
     userList, rankList = get_rank_order(val_users, "hrank", limit)
     embed = disnake.Embed(title="Highest Ranks", color=disnake.Color.blue())
     embed.add_field(name="Val User", value="\n".join(userList), inline=True)

@@ -13,7 +13,7 @@ def rank2num(rankStr: str) -> int:
         "Immortal",
         "Radiant",
     ]
-    if rankStr is None or rankStr in ["Unranked", "Unrated"]:
+    if rankStr is None or rankStr in ["Unranked", "Unrated", "Unset"]:
         return 0
     rank, level = rankStr.split(" ")
     return ranks.index(rank) * 10 + int(level)

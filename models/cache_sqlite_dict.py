@@ -2,6 +2,7 @@ import time
 from typing import Any, Callable
 
 from sqlitedict import SqliteDict
+from collections import defaultdict
 
 
 class CacheSqliteDict(SqliteDict):
@@ -15,7 +16,9 @@ class CacheSqliteDict(SqliteDict):
         super().__init__(*args, **kwargs)
         self.on_expire = super().__getitem__ if on_expire is None else on_expire
         self.expire_time = expire_time
-        self.last_fetch_time: dict[Any, float] = {}
+        self.last_fetch_time: defaultdict[Any, float] = defaultdict(
+            self.get_expire_time
+        )
         self.cache_data: dict[Any, Any] = {}
 
     def __setitem__(self, key: Any, value: Any) -> None:
@@ -25,8 +28,6 @@ class CacheSqliteDict(SqliteDict):
         self.cache_data[key] = value
 
     def __getitem__(self, key: Any) -> Any:
-        if key not in self.last_fetch_time:
-            self.last_fetch_time[key] = time.time() - self.expire_time - 1
         if (
             not self.__contains__(key)
             or time.time() - self.last_fetch_time[key] > self.expire_time
@@ -43,6 +44,9 @@ class CacheSqliteDict(SqliteDict):
         del self.cache_data[key]
         del self.last_fetch_time[key]
 
+    def get_expire_time(self):
+        return time.time() - self.expire_time - 1
+
     def expire(self, key: Any) -> None:
-        self.last_fetch_time[key] = time.time() - self.expire_time - 1
+        self.last_fetch_time[key] = self.get_expire_time()
         self.__setitem__(key, self.on_expire(key))

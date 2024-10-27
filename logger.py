@@ -33,7 +33,7 @@ def set_logger() -> None:
     logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
     logger.remove()
     logger.add(stderr, level="INFO")
-    logger.add(settings.log_filename, level="INFO")
+    logger.add(settings.log_filename, level="DEBUG", rotation="1 week")
 
 
 set_logger()

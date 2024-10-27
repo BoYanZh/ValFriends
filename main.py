@@ -375,6 +375,7 @@ async def update() -> None:
     """
     Update dataset automatically in the background.
     """
+    logger.debug("auto update triggered")
     # feature of sqlite rowid table, used by sqlitedict
     # items are sorted by rowid, and generally the latest updated row has the largest rowid
     for key, value in val_users.items():

@@ -378,10 +378,13 @@ async def update() -> None:
     logger.info("auto update triggered")
     # feature of sqlite rowid table, used by sqlitedict
     # items are sorted by rowid, and generally the latest updated row has the largest rowid
+    value: ValUser
     for key, value in val_users.items():
+        now = time.time()
+        logger.info(f"Start auto update, stats of {value.fullname} updated at {now - val_users.last_fetch_time[key]:.2f}s ago.")
         val_users.expire(key)
         val_user_stats.expire(key)
-        logger.info(f"Stats of {value.fullname} updated at {time.time() - val_users.last_fetch_time[key]}s ago.")
+        logger.info(f"Done auto update, stats of {value.fullname} updated at {now - val_users.last_fetch_time[key]:.2f}s ago.")
         break
 
 

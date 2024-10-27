@@ -381,7 +381,7 @@ async def update() -> None:
     value: ValUser
     for key, value in val_users.items():
         now = time.time()
-        logger.info(f"Start auto update, stats of {value.fullname} updated at {now - val_users.last_fetch_time[key]:.2f}s ago.")
+        logger.info(f"Start auto update, stats of {value.fullname} updated at {now - val_users.last_fetch_time.get(key, float('inf')):.2f}s ago.")
         val_users.expire(key)
         val_user_stats.expire(key)
         logger.info(f"Done auto update, stats of {value.fullname} updated at {now - val_users.last_fetch_time[key]:.2f}s ago.")

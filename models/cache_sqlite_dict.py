@@ -1,8 +1,8 @@
 import time
+from collections import defaultdict
 from typing import Any, Callable
 
 from sqlitedict import SqliteDict
-from collections import defaultdict
 
 
 class CacheSqliteDict(SqliteDict):
@@ -44,7 +44,7 @@ class CacheSqliteDict(SqliteDict):
         del self.cache_data[key]
         del self.last_fetch_time[key]
 
-    def get_expire_time(self):
+    def get_expire_time(self) -> float:
         return time.time() - self.expire_time - 1
 
     def expire(self, key: Any) -> None:

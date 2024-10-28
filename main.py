@@ -1,11 +1,11 @@
 import asyncio
-from datetime import datetime
 import time
 import traceback
+from datetime import datetime
 from typing import List
 
 import disnake
-from disnake.ext import tasks, commands
+from disnake.ext import commands, tasks
 
 import keep_alive
 from logger import logger
@@ -14,8 +14,8 @@ from models.users.valorant import (
     ValStats,
     ValUser,
     fullname2puuid,
-    val_users,
     val_user_stats,
+    val_users,
 )
 from settings import settings
 from utils import get_rank_order
@@ -329,7 +329,7 @@ async def vote(
 
 async def on_reaction_change(
     reaction: disnake.Reaction, user: disnake.User | disnake.Member
-):
+) -> None:
     msg = reaction.message
     if msg.author.id != bot.user.id or user.id == bot.user.id:
         return
@@ -344,21 +344,21 @@ async def on_reaction_change(
 @bot.event
 async def on_reaction_add(
     reaction: disnake.Reaction, user: disnake.User | disnake.Member
-):
+) -> None:
     await on_reaction_change(reaction, user)
 
 
 @bot.event
 async def on_reaction_remove(
     reaction: disnake.Reaction, user: disnake.User | disnake.Member
-):
+) -> None:
     await on_reaction_change(reaction, user)
 
 
 @bot.event
 async def on_slash_command_error(
     inter: disnake.ApplicationCommandInteraction, exception: commands.CommandError
-):
+) -> None:
     logger.error(
         f"An exception occurred: {exception}"
         + "\n".join(
@@ -375,17 +375,24 @@ async def update() -> None:
     """
     Update dataset automatically in the background.
     """
-    logger.info("auto update triggered")
-    # feature of sqlite rowid table, used by sqlitedict
-    # items are sorted by rowid, and generally the latest updated row has the largest rowid
-    value: ValUser
-    for key, value in val_users.items():
-        now = time.time()
-        logger.info(f"Start auto update, stats of {value.fullname} updated at {now - val_users.last_fetch_time[key]:.2f}s ago.")
-        val_users.expire(key)
-        val_user_stats.expire(key)
-        logger.info(f"Done auto update, stats of {value.fullname} updated at {now - val_users.last_fetch_time[key]:.2f}s ago.")
-        break
+    try:
+        logger.info("auto update triggered")
+        # feature of sqlite rowid table, used by sqlitedict
+        # items are sorted by rowid, and generally the latest updated row has the largest rowid
+        value: ValUser
+        for key, value in val_users.items():
+            now = time.time()
+            logger.info(
+                f"Start auto update, stats of {value.fullname} updated at {now - val_users.last_fetch_time[key]:.2f}s ago."
+            )
+            val_users.expire(key)
+            val_user_stats.expire(key)
+            logger.info(
+                f"Done auto update, stats of {value.fullname} updated at {now - val_users.last_fetch_time[key]:.2f}s ago."
+            )
+            break
+    except Exception as e:
+        logger.error(f"auto update error: {e}")
 
 
 if __name__ == "__main__":
